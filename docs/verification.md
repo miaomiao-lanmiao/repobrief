@@ -15,7 +15,7 @@ Git 2.53.0.windows.2. The first commit contains only `docs/spec.md`.
 | `npm run check:security` | Passed for 10 runtime modules and npm lockfile |
 | `npm run check:package` | Passed: offline tarball install, actual installed bin shim, help/version/changelog/deps |
 | `npm audit --json` | 0 reported vulnerabilities at verification time; not a guarantee |
-| PowerShell publishing script | Parsed successfully; remote execution is gated by GitHub authentication |
+| PowerShell publishing script | Parsed successfully; attempted execution stopped on GitHub API timeout before any remote mutation |
 | README quickstart | Build, help, changelog, JSON deps, PR and tests exercised locally |
 
 Security checks inspect disallowed dynamic execution/network patterns, shell

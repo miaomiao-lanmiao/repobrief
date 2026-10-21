@@ -13,7 +13,7 @@ using data already on disk. It does not claim to detect known vulnerabilities.
 Requirements: Node.js **22+**, npm, and Git on your PATH. The `deps` command also
 works in directories that are not Git repositories. Use a current Git version.
 
-Run these commands **from a downloaded or cloned RepoBrief source directory**:
+Run these commands **from a Git clone of the RepoBrief source repository**:
 
 ```sh
 npm ci --ignore-scripts
@@ -24,6 +24,11 @@ node dist/cli.js deps --repo . --format json
 node dist/cli.js pr --repo . --base main
 npm test
 ```
+
+Source ZIP archives do not contain Git history. ZIP users can build and run
+`deps` directly; point `changelog` and `pr` at an existing Git working tree with
+`--repo`. The accompanying Git bundle, when provided, preserves all history and
+can be cloned with `git clone repobrief-v0.1.0.bundle repobrief`.
 
 To install the command globally **from this source checkout**, after building:
 
