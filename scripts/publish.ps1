@@ -18,6 +18,22 @@ function Invoke-Checked {
 
 Push-Location -LiteralPath $projectRoot
 try {
+    # gh uses environment proxies, while Windows browsers use the system setting.
+    # Reuse the configured system proxy only for this publishing process.
+    if ($env:OS -eq 'Windows_NT' -and -not $env:HTTPS_PROXY -and -not $env:HTTP_PROXY) {
+        $settings = Get-ItemProperty -LiteralPath 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings' -ErrorAction SilentlyContinue
+        if ($settings.ProxyEnable -eq 1 -and $settings.ProxyServer) {
+            $proxy = [string]$settings.ProxyServer
+            if ($proxy -match '(?:^|;)https=([^;]+)') { $proxy = $Matches[1] }
+            elseif ($proxy.Contains('=')) { $proxy = '' }
+            if ($proxy -match '^(?:https?://)?(?:\[[0-9a-fA-F:]+\]|[A-Za-z0-9.-]+):\d{1,5}$') {
+                if ($proxy -notmatch '^https?://') { $proxy = "http://$proxy" }
+                $env:HTTPS_PROXY = $proxy
+                $env:HTTP_PROXY = $proxy
+                Write-Output 'Using the existing Windows system proxy for publishing.'
+            }
+        }
+    }
     # Authenticate before any remote mutation; never read or print stored tokens.
     $login = & gh api --hostname github.com user --jq .login
     if ($LASTEXITCODE -ne 0 -or -not $login -or $login -notmatch '^[A-Za-z0-9-]+$') {

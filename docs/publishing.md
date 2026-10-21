@@ -31,5 +31,9 @@ and CI. Authentication/network/CI failures stop subsequent steps. An existing
 local tag, public repository or pushed branch may remain after a later failure;
 rerun the same command after fixing the reported blocker.
 
+On Windows, when neither proxy environment variable is set, the script reuses an
+enabled HTTP(S) system proxy for the current process. Existing environment proxies
+take precedence. It does not edit Windows proxy settings or Git configuration.
+
 Remote CI success must be checked from GitHub. A local test run alone does not
 verify Linux/macOS or a hosted GitHub Actions run.

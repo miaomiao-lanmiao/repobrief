@@ -26,12 +26,14 @@ oversized JSON, merge-base semantics and refusal to overwrite output.
 
 ## Remote work pending
 
-The installed `gh` reports its saved GitHub account as invalid. API calls also
-failed with connection resets and timeouts, so the credential's actual validity
-could not be confirmed independently. No token was read, displayed or modified.
+The initial direct `gh` connection failed with resets/timeouts and reported an
+invalid login. On resumption, the existing Windows system proxy restored API
+access and authenticated account `miaomiao-lanmiao` successfully. The saved
+credential was valid; the direct network route was the blocker. No token was
+read, displayed or modified. The publishing script now reuses that proxy when
+no proxy environment variables have already been configured.
 
-No public repository URL, push, GitHub Actions run, or GitHub release draft has
-been confirmed. The six-job CI workflow is configured; only Windows/Node 24 was
-executed locally. Versioned release notes and a resumable publishing script are
-provided. Restore GitHub connectivity/authentication and run `scripts/publish.ps1`
-to finish public repository creation, all-branch/tag push, remote CI, and the draft.
+The original delivery had no public repository, push, remote CI or release draft.
+The resumed publishing script checks the six-job GitHub CI at HEAD before creating
+a release draft. Consult the repository's Actions and Releases pages for the live
+remote result; local checks alone verify only Windows/Node 24.
