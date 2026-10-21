@@ -16,6 +16,24 @@ function Invoke-Checked {
     }
 }
 
+function Invoke-GitRemote {
+    param([string[]]$Arguments)
+    $savedGlobal = $env:GIT_CONFIG_GLOBAL
+    $savedNoSystem = $env:GIT_CONFIG_NOSYSTEM
+    $savedNoVerify = $env:GIT_SSL_NO_VERIFY
+    try {
+        $env:GIT_CONFIG_GLOBAL = if ($env:OS -eq 'Windows_NT') { 'NUL' } else { '/dev/null' }
+        $env:GIT_CONFIG_NOSYSTEM = '1'
+        Remove-Item Env:GIT_SSL_NO_VERIFY -ErrorAction SilentlyContinue
+        Invoke-Checked 'git' (@('-c', 'http.sslVerify=true', '-c', 'credential.helper=',
+            '-c', 'credential.helper=!gh auth git-credential') + $Arguments)
+    } finally {
+        $env:GIT_CONFIG_GLOBAL = $savedGlobal
+        $env:GIT_CONFIG_NOSYSTEM = $savedNoSystem
+        $env:GIT_SSL_NO_VERIFY = $savedNoVerify
+    }
+}
+
 Push-Location -LiteralPath $projectRoot
 try {
     # gh uses environment proxies, while Windows browsers use the system setting.
@@ -57,7 +75,7 @@ try {
     $remoteNames = @(& git remote)
     if ($LASTEXITCODE -ne 0) { throw 'Cannot inspect remotes.' }
     if ($remoteNames -contains 'origin') {
-        $origin = & git remote get-url origin
+        $origin = & git config --local --get remote.origin.url
         if ($LASTEXITCODE -ne 0) { throw 'Cannot read origin.' }
         $allowedOrigins = @("https://github.com/$repository", "https://github.com/$repository.git", "git@github.com:$repository.git")
         if ($origin -notin $allowedOrigins) { throw 'Origin does not match the requested repository; refusing to push.' }
@@ -91,8 +109,8 @@ try {
         Invoke-Checked 'gh' @('repo', 'create', $repository, '--public', '--source', $projectRoot,
             '--remote', 'origin', '--description', 'Offline Git changelogs, dependency configuration checks, and PR descriptions. Zero runtime dependencies.')
     }
-    Invoke-Checked 'git' @('push', '--set-upstream', 'origin', '--all')
-    Invoke-Checked 'git' @('push', 'origin', '--tags')
+    Invoke-GitRemote @('push', '--set-upstream', 'origin', '--all')
+    Invoke-GitRemote @('push', 'origin', '--tags')
 
     # GitHub may take a moment to register a new push. Bound this registration wait.
     $ciRun = $null

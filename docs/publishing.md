@@ -35,5 +35,10 @@ On Windows, when neither proxy environment variable is set, the script reuses an
 enabled HTTP(S) system proxy for the current process. Existing environment proxies
 take precedence. It does not edit Windows proxy settings or Git configuration.
 
+Remote Git operations isolate global/system Git configuration, enforce TLS
+verification, and use the authenticated GitHub CLI credential helper. This avoids
+global URL rewrites to mirrors and interactive credential-manager prompts.
+The original Git environment is restored after each remote operation.
+
 Remote CI success must be checked from GitHub. A local test run alone does not
 verify Linux/macOS or a hosted GitHub Actions run.
