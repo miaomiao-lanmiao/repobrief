@@ -1,0 +1,11 @@
+{
+  "name": "repobrief-risk-demo",
+  "private": true,
+  "dependencies": {
+    "example-range": "^1.0.0",
+    "example-workspace": "workspace:*"
+  },
+  "scripts": {
+    "postinstall": "echo demonstration-only-do-not-install"
+  }
+}

@@ -28,7 +28,8 @@ export class GitRepository {
     const result = spawnSync('git', ['--no-pager', '--no-replace-objects', '-C', this.root, ...args], {
       encoding: 'utf8', shell: false, windowsHide: true, timeout: 15000,
       maxBuffer: 32 * 1024 * 1024,
-      env: { ...process.env, GIT_OPTIONAL_LOCKS: '0', GIT_TERMINAL_PROMPT: '0', GIT_NO_LAZY_FETCH: '1' },
+      env: { ...process.env, GIT_OPTIONAL_LOCKS: '0', GIT_TERMINAL_PROMPT: '0',
+        GIT_NO_LAZY_FETCH: '1', GIT_ALLOW_PROTOCOL: '' },
     });
     if (result.error || result.status !== 0) {
       // Git stderr can include private paths, credential URLs, or hostile revisions.
