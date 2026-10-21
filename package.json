@@ -1,0 +1,39 @@
+{
+  "name": "repobrief-cli",
+  "version": "0.1.0",
+  "description": "Offline Git changelogs, dependency configuration checks, and PR descriptions.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "repobrief": "dist/cli.js"
+  },
+  "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "test:smoke": "npm run build && node --test test/smoke.test.mjs",
+    "check:security": "node scripts/security-check.mjs",
+    "check:package": "node scripts/package-smoke.mjs",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "git",
+    "changelog",
+    "offline",
+    "pull-request",
+    "dependency-audit"
+  ],
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "7.0.2"
+  }
+}
