@@ -22,6 +22,7 @@ const exactVersion = /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-[0-9a-z
 const lexical = (a: string, b: string): number => a < b ? -1 : a > b ? 1 : 0;
 
 function sourceKind(value: string): 'local' | 'insecure' | 'remote' | 'registry' {
+  if (value.startsWith('npm:')) return 'registry';
   if (/^(?:file:|link:|workspace:|\.\.?[/\\]|[/\\]|[a-z]:[/\\])/i.test(value)) return 'local';
   if (/^(?:http:|git:\/\/)/i.test(value)) return 'insecure';
   if (/^(?:git\+|git:|https:|ssh:|git@|github:|gitlab:|bitbucket:)/i.test(value)
