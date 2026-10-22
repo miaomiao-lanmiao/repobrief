@@ -128,5 +128,5 @@ test('CLI help and version do not require a Git repository', () => {
   assert.equal(help.status, 0);
   assert.match(help.stdout, /RepoBrief/);
   const version = spawnSync(process.execPath, [cli, '--version'], { encoding: 'utf8' });
-  assert.equal(version.stdout, '0.1.0\n');
+  assert.equal(version.stdout, '0.1.1\n');
 });

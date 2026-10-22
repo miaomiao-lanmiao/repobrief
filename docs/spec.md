@@ -2,6 +2,9 @@
 
 Status: v0.1.0 scope, 2026-10-22.
 
+Maintenance v0.1.1 (2026-10-23): inherited Git repository selectors must not redirect
+an explicit `--repo`. Linked worktrees and legal path whitespace remain supported.
+
 ## Problem and audience
 
 Maintainers of small Git repositories repeatedly turn commit history into release

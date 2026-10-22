@@ -154,6 +154,9 @@ Library exports are available from `dist/index.js` after building.
 - Revision arguments resolve to commit IDs before diff/log use. Each Git operation
   has a 15-second timeout and 32 MiB output cap. JSON input is limited to regular
   files of at most 16 MiB and lockfiles to 100000 entries.
+- `--repo` selects the repository independently of inherited Git repository
+  selector variables. Linked worktrees are supported. User Git configuration is
+  still trusted; this does not sandbox a modified Git installation.
 - Dependency source values and lifecycle command bodies are omitted from reports,
   so credentials in those fields are not copied. Commit text, project names and
   filenames may still be private; review output before sharing it.

@@ -23,7 +23,7 @@ try {
   runNpm(['install', '--offline', '--ignore-scripts', '--no-audit', '--no-fund', '--prefix', directory, archive], directory);
   const packageRoot = join(directory, 'node_modules', 'repobrief-cli');
   const manifest = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf8'));
-  assert.equal(manifest.version, '0.1.0');
+  assert.equal(manifest.version, JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version);
   assert.equal(Object.keys(manifest.dependencies ?? {}).length, 0);
   assert.ok(!readdirSync(packageRoot).includes('test'));
   const cli = resolve(packageRoot, 'dist/cli.js');

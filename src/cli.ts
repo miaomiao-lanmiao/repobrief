@@ -38,7 +38,7 @@ try {
   if (args.length === 0 || (args.length === 1 && args[0] === '--help')) {
     process.stdout.write(help);
   } else if (args.length === 1 && args[0] === '--version') {
-    process.stdout.write('0.1.0\n');
+    process.stdout.write('0.1.1\n');
   } else {
     const options = parseArgs(args);
     let report: Report;
