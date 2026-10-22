@@ -21,14 +21,19 @@ export class GitRepository {
       throw new UserError('Expected a Git working tree.');
     }
     // Always report the whole repository even when invoked from a subdirectory.
-    this.root = this.run(['rev-parse', '--show-toplevel']).trim();
+    this.root = this.run(['rev-parse', '--show-toplevel']).replace(/\r?\n$/, '');
   }
 
   private run(args: string[]): string {
+    const env = { ...process.env };
+    const selectors = new Set(['GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR', 'GIT_INDEX_FILE',
+      'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_CEILING_DIRECTORIES',
+      'GIT_DISCOVERY_ACROSS_FILESYSTEM', 'GIT_SHALLOW_FILE', 'GIT_NAMESPACE']);
+    for (const key of Object.keys(env)) if (selectors.has(key.toUpperCase())) delete env[key];
     const result = spawnSync('git', ['--no-pager', '--no-replace-objects', '-C', this.root, ...args], {
       encoding: 'utf8', shell: false, windowsHide: true, timeout: 15000,
       maxBuffer: 32 * 1024 * 1024,
-      env: { ...process.env, GIT_OPTIONAL_LOCKS: '0', GIT_TERMINAL_PROMPT: '0',
+      env: { ...env, GIT_OPTIONAL_LOCKS: '0', GIT_TERMINAL_PROMPT: '0',
         GIT_NO_LAZY_FETCH: '1', GIT_ALLOW_PROTOCOL: '' },
     });
     if (result.error || result.status !== 0) {

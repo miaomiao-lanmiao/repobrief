@@ -1,6 +1,6 @@
 {
   "name": "repobrief-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Offline Git changelogs, dependency configuration checks, and PR descriptions.",
   "type": "module",
   "license": "MIT",
