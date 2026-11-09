@@ -38,7 +38,7 @@ test('end-to-end: changelog, diverged PR, deps, output safety, invalid inputs', 
   git(repo, 'switch', '-c', 'feature');
   writeFileSync(join(repo, 'new file.txt'), 'new\n');
   git(repo, 'add', '.');
-  git(repo, 'commit', '-m', 'feat(api)!: add output', '-m', 'BREAKING CHANGE: use the new output format');
+  git(repo, 'commit', '-m', 'feat(api)!: add output', '-m', 'BREAKING CHANGE: use the new output format\nRead data.result instead of the top-level value.\n\nRefs: #42');
   writeFileSync(join(repo, 'hello.txt'), 'fixed\n');
   git(repo, 'add', '.');
   git(repo, 'commit', '-m', 'fix: handle spaces');
@@ -53,12 +53,17 @@ test('end-to-end: changelog, diverged PR, deps, output safety, invalid inputs', 
     assert.equal(report.commits.length, 2);
     assert.equal(report.commits[0].type, 'fix');
     assert.equal(report.commits[1].breaking, true);
+    assert.deepEqual(report.commits[1].breakingNotes, [
+      'use the new output format Read data.result instead of the top-level value.',
+    ]);
     assert.equal(report.from, initial);
     const text = run(repo, 'changelog', '--from', 'v0.0.0', '--to', 'feature');
     assert.equal(text.status, 0, text.stderr);
     assert.match(text.stdout, /## Features/);
     assert.match(text.stdout, /## Fixes/);
     assert.match(text.stdout, /## Breaking changes/);
+    assert.ok(text.stdout.includes('Read data\\.result instead of the top\\-level value\\.'));
+    assert.doesNotMatch(text.stdout, /Refs:/);
     assert.equal(json(repo, 'changelog', '--from', 'feature', '--to', 'feature').commits.length, 0);
   });
   await t.test('PR compares the merge base rather than the diverged base tip', () => {
@@ -128,5 +133,5 @@ test('CLI help and version do not require a Git repository', () => {
   assert.equal(help.status, 0);
   assert.match(help.stdout, /RepoBrief/);
   const version = spawnSync(process.execPath, [cli, '--version'], { encoding: 'utf8' });
-  assert.equal(version.stdout, '0.1.1\n');
+  assert.equal(version.stdout, '0.1.2\n');
 });
