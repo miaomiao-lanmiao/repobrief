@@ -10,12 +10,34 @@ export interface Commit {
   breakingNotes: string[];
 }
 
+function breakingNotesFrom(body: string): string[] {
+  const notes: string[] = [];
+  let current: string[] | undefined;
+  const finish = (): void => {
+    if (current) {
+      const note = cleanText(current.join('\n'));
+      if (note) notes.push(note);
+    }
+    current = undefined;
+  };
+  for (const line of body.split(/\r?\n/)) {
+    const breaking = /^BREAKING[ -]CHANGE:[ \t]*(.*)$/s.exec(line);
+    if (breaking) {
+      finish();
+      current = [breaking[1]!];
+    } else if (/^[A-Za-z0-9][A-Za-z0-9_-]*(?::[ \t]+|[ \t]+#)/.test(line)) {
+      finish();
+    } else if (current) {
+      current.push(line);
+    }
+  }
+  finish();
+  return notes;
+}
+
 export function parseCommit(hash: string, subject: string, body: string): Commit {
   const match = /^([a-z][a-z0-9-]*)(?:\(([^)\r\n]+)\))?(!)?:\s+(.+)$/i.exec(subject);
-  const breakingNotes = body.split(/\r?\n/)
-    .filter(line => /^BREAKING[ -]CHANGE:\s*/.test(line))
-    .map(line => cleanText(line.replace(/^BREAKING[ -]CHANGE:\s*/, '')))
-    .filter(Boolean);
+  const breakingNotes = breakingNotesFrom(body);
   return {
     hash, subject: cleanText(subject), type: match?.[1]?.toLowerCase() ?? 'other',
     scope: match?.[2] ? cleanText(match[2]) : null,

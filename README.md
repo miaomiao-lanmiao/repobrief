@@ -63,6 +63,10 @@ Flags must be separate arguments (`--format json`, not `--format=json`).
 `--to` defaults to `HEAD`; `pr --base` defaults to `main`.
 History is limited to 1000 commits unless `--limit N` is set (maximum 10000).
 An exceeded limit is an error, so a report never silently omits commits.
+Breaking-change notes retain continuation lines and paragraphs until the next
+Conventional Commit footer (`Refs: #42`, `Refs #42`, or another footer token).
+Whitespace is normalized for report display; multiple breaking-change footers
+remain separate notes in both Markdown and JSON.
 `--output` resolves from the invoking directory and refuses to replace any existing
 file. Omit it to print to stdout. No automatic fetch, checkout, or commit occurs.
 

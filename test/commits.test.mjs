@@ -15,6 +15,43 @@ test('recognizes exclamation breaking changes and hyphenated footers', () => {
   assert.equal(parseCommit(hash, 'fix!: change behavior', '').breaking, true);
   assert.equal(parseCommit(hash, 'ordinary', 'BREAKING-CHANGE: migrate').breaking, true);
 });
+test('recognizes breaking footers with Unicode separators or a carriage return in the value', () => {
+  for (const separator of ['\u2028', '\u2029', '\r']) {
+    const commit = parseCommit(hash, 'fix: change the output format', `BREAKING CHANGE: Use the new${separator}format.`);
+    assert.equal(commit.breaking, true);
+    assert.deepEqual(commit.breakingNotes, ['Use the new format.']);
+  }
+});
+test('preserves multiline and multi-paragraph breaking-change migration notes', () => {
+  const commit = parseCommit(hash, 'feat(api): return structured results', [
+    'Explain the implementation.', '',
+    'BREAKING CHANGE: responses now return an object.',
+    'Read the value from data.result.', '',
+    'Update cached response schemas too.', '',
+  ].join('\n'));
+  assert.equal(commit.breaking, true);
+  assert.deepEqual(commit.breakingNotes, [
+    'responses now return an object. Read the value from data.result. Update cached response schemas too.',
+  ]);
+});
+test('breaking-note continuation stops at either supported footer separator', () => {
+  for (const trailer of ['Refs: #42', 'Refs #42', 'Reviewed-by: Example']) {
+    const commit = parseCommit(hash, 'fix(api): change response',
+      `BREAKING CHANGE: use the new response.\nUpdate callers before upgrading.\n\n${trailer}\nTrailer continuation.`);
+    assert.deepEqual(commit.breakingNotes, ['use the new response. Update callers before upgrading.']);
+  }
+});
+test('multiple breaking-change footers keep separate normalized notes', () => {
+  const commit = parseCommit(hash, 'feat(api): change contracts', [
+    'BREAKING CHANGE: remove the old response.', 'Use the new envelope.', '',
+    'Reviewed-by: Example', '', 'BREAKING-CHANGE: rename the old option.',
+    'Pass the replacement flag.', 'Refs: #42',
+  ].join('\r\n'));
+  assert.deepEqual(commit.breakingNotes, [
+    'remove the old response. Use the new envelope.',
+    'rename the old option. Pass the replacement flag.',
+  ]);
+});
 test('ordinary commits preserve their description', () => {
   const commit = parseCommit(hash, 'Fix an edge case', '');
   assert.equal(commit.type, 'other');
