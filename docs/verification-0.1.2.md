@@ -11,6 +11,10 @@ The synthetic fixtures cover continuation paragraphs, colon/hash footer
 separators, CRLF, and multiple breaking-change entries. Their repaired outputs
 retain the migration text and exclude following reference/reviewer trailers.
 
+A compatibility regression failed before the footer matcher was corrected. It
+confirms that U+2028, U+2029 and an embedded carriage return in a footer value
+normalize to spaces without losing the breaking-change classification.
+
 The parser follows the continuation rule in
 [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/).
 Whitespace is normalized for display; this update does not add rich formatting
@@ -19,7 +23,7 @@ or change the JSON schema.
 ## Local gates
 
 - `npm ci --ignore-scripts`: passed from a clean dependency install.
-- `npm test`: 56 passed, 0 failed, including real Git CLI smoke tests.
+- `npm test`: 57 passed, 0 failed, including real Git CLI smoke tests.
 - `npm run build`: passed.
 - `npm run check:security`: passed for the 10 runtime modules and lockfile.
 - `npm run check:package`: the packed CLI installed offline and its actual

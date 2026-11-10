@@ -15,6 +15,13 @@ test('recognizes exclamation breaking changes and hyphenated footers', () => {
   assert.equal(parseCommit(hash, 'fix!: change behavior', '').breaking, true);
   assert.equal(parseCommit(hash, 'ordinary', 'BREAKING-CHANGE: migrate').breaking, true);
 });
+test('recognizes breaking footers with Unicode separators or a carriage return in the value', () => {
+  for (const separator of ['\u2028', '\u2029', '\r']) {
+    const commit = parseCommit(hash, 'fix: change the output format', `BREAKING CHANGE: Use the new${separator}format.`);
+    assert.equal(commit.breaking, true);
+    assert.deepEqual(commit.breakingNotes, ['Use the new format.']);
+  }
+});
 test('preserves multiline and multi-paragraph breaking-change migration notes', () => {
   const commit = parseCommit(hash, 'feat(api): return structured results', [
     'Explain the implementation.', '',

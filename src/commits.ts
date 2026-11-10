@@ -21,7 +21,7 @@ function breakingNotesFrom(body: string): string[] {
     current = undefined;
   };
   for (const line of body.split(/\r?\n/)) {
-    const breaking = /^BREAKING[ -]CHANGE:[ \t]*(.*)$/.exec(line);
+    const breaking = /^BREAKING[ -]CHANGE:[ \t]*(.*)$/s.exec(line);
     if (breaking) {
       finish();
       current = [breaking[1]!];
